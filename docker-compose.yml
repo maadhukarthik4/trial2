@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - "4317:4317" # OTLP gRPC endpoint
+      - "4318:4318" # OTLP http endpoint
+    volumes:
+      - ./otel-local-config.yaml:/otel-local-config.yaml
+    command: ["--config", "/otel-local-config.yaml"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/prometheus.yml
+    command:
+      - "--config.file=/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Set Grafana admin password

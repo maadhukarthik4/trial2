@@ -1,0 +1,38 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - http://*
+            - https://* 
+            
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: "otel-collector"
+        scrape_interval: 10s
+        static_configs:
+        - targets: ['0.0.0.0:9090']            
+exporters:
+  logging:
+    verbosity: basic
+  prometheus:
+    endpoint: "0.0.0.0:9090" # Expose metrics for Prometheus
+    resource_to_telemetry_conversion:
+      enabled: false   
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging]
+    metrics:
+      receivers: [prometheus]
+      exporters: [prometheus]
+
+
+
